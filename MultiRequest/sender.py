@@ -29,10 +29,12 @@ class Sender:
             yield _task
         _update_worker_task.cancel()
 
-    async def gather(self):
-        update_worker_task = asyncio.create_task(self._update_worker())
-        await asyncio.gather(*[self._processing_task(task) for task in self.tasks])
-        return self.tasks
+    async def run(self) -> Request:
+        _update_worker_task = asyncio.create_task(self._update_worker())
+        for _task in self.tasks:
+            async for _request in self._processing_task(_task):
+                yield _request
+        _update_worker_task.cancel()
 
     async def _processing_task(self, task: Task):
         if not self.proxies:
