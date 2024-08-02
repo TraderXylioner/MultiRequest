@@ -1,9 +1,14 @@
-from pydantic import BaseModel
+from aiohttp import ClientResponse
+from pydantic import BaseModel, ConfigDict
 
 from .service import Service
 
 
 class Request(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     url: str
     service: Service
-    response: dict | None = None
+    name: str | None = None
+    data: object | None = None
+    response_object: ClientResponse | None = None
