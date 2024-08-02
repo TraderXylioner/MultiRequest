@@ -58,9 +58,8 @@ class Sender:
             for proxy in service:
                 if service[proxy] > 0:
                     service[proxy] -= 1
-                    _response = await self._send_request(request, proxy)
-                    request.response = _response
-                    return
+                    request.data, request.response_object = await self._send_request(request, proxy)
+                    return request
                 await asyncio.sleep(0)
 
     @classmethod
@@ -71,7 +70,6 @@ class Sender:
                 _proxy = None if proxy == 'localhost' else proxy.to_string()
                 async with aiohttp.ClientSession(trust_env=True) as session:
                     async with session.get(url=request.url, proxy=_proxy, ssl=True) as response:
-                        _response = await response.json()
-                        return _response
+                        return await response.content.read(), response
             except Exception as ex:
                 raise ex  # TODO:
