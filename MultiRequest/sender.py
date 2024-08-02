@@ -21,11 +21,13 @@ class Sender:
         self._worker = {}
         self._worker_time_update = time.time()
 
-    async def run(self):
-        update_worker_task = asyncio.create_task(self._update_worker())
-        for task in self.tasks:
-            await self._processing_task(task)
-            yield task
+    async def multi_task_run(self) -> Task:
+        _update_worker_task = asyncio.create_task(self._update_worker())
+        for _task in self.tasks:
+            async for _request in self._processing_task(_task):
+                ...
+            yield _task
+        _update_worker_task.cancel()
 
     async def gather(self):
         update_worker_task = asyncio.create_task(self._update_worker())
