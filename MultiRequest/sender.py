@@ -39,14 +39,14 @@ class Sender:
     async def _processing_task(self, task: Task):
         if not self.proxies:
             raise Exception('proxies not set')  # TODO:
-        _tasks = [asyncio.create_task(self._processing_request(request)) for request in task.requests]
-        for i in _tasks:
-            await i
-        return task
+        _requests = [asyncio.create_task(self._processing_request(_request)) for _request in task.requests]
+        for _request in _requests:
+            await _request
+            yield _request.result()
 
     def _create_worker(self):
-        for service in self.services:
-            self._worker.setdefault(service.name, {}).update({proxy: service.rate_limit for proxy in self.proxies})
+        for _service in self.services:
+            self._worker.setdefault(_service.name, {}).update({proxy: _service.rate_limit for proxy in self.proxies})
         self._worker_time_update = time.time()
 
     async def _update_worker(self):
