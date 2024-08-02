@@ -36,7 +36,7 @@ class Sender:
                 yield _request
         _update_worker_task.cancel()
 
-    async def _processing_task(self, task: Task):
+    async def _processing_task(self, task: Task) -> Request:
         if not self.proxies:
             raise Exception('proxies not set')  # TODO:
         _requests = [asyncio.create_task(self._processing_request(_request)) for _request in task.requests]
@@ -56,7 +56,7 @@ class Sender:
                 self._create_worker()
             await asyncio.sleep(0)
 
-    async def _processing_request(self, request: Request):
+    async def _processing_request(self, request: Request) -> Request:
         while True:
             service = self._worker[request.service.name]
             for proxy in service:
