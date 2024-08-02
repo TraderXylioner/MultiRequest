@@ -67,7 +67,7 @@ class Sender:
                 await asyncio.sleep(0)
 
     @classmethod
-    async def _send_request(cls, request: Request, proxy: Proxy, attempts: int = 10):
+    async def _send_request(cls, request: Request, proxy: Proxy, attempts: int = 10) -> bytes:
         while attempts:
             try:
                 attempts -= 1
