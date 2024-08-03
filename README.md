@@ -11,7 +11,7 @@ MultiRequest is a library designed for sending asynchronous requests concurrentl
 
 ### Create a Service
 
-Define a service with a rate limit:
+Define a service with a rate limit.
 
 ``` python
 from MultiRequest.types import Service
@@ -31,7 +31,7 @@ proxy = Proxy(protocol='HTTPS', ip='0.0.0.0', port=80, user='user', password='pa
 
 ### Create a Request
 
-Define a request for a specific URL and service..
+Define a request for a specific URL and service.
 
 ``` python
 from MultiRequest.types import Request
@@ -93,8 +93,8 @@ if __name__ == '__main__':
 
 ### Base Sender
 
-
-For example, we want to collect data from the JSONPlaceHolder service, which allows us to send up to 10 requests per second. We aim to collect data from 200 pages.
+For example, we want to collect data from the JSONPlaceHolder service, which allows us to send up to 10 requests per
+second. We aim to collect data from 200 pages.
 
 Here's how you might achieve that:
 
