@@ -4,7 +4,7 @@ MultiRequest is a library designed for sending asynchronous requests concurrentl
 
 ## Functionality
 
-- __Support for Multiple Services:__ Allows sending requests to multiple services..
+- __Support for Multiple Services:__ Allows sending requests to multiple services.
 - __Proxy:__ Optional use of a proxy to accelerate data collection.
 
 ## Quickstart
@@ -71,7 +71,7 @@ if __name__ == '__main__':
 
 ### Run Multi-Task Sender
 
-Send multiple tasks concurrently:
+Send multiple tasks concurrently.
 
 ``` python
 import asyncio
