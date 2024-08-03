@@ -16,7 +16,7 @@ class Proxy(BaseModel):
     password: str | None = None
 
     def to_string(self):
-        if self.user:
+        if self.user and self.password:
             return f'{self.protocol.value.lower()}://{self.user}:{self.password}@{self.ip}:{self.port}'
         else:
             return f'{self.protocol.value.lower()}://{self.ip}:{self.port}'
