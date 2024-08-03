@@ -92,4 +92,4 @@ class Sender:
                     async with session.get(url=request.url, proxy=_proxy, ssl=True) as response:
                         return await response.content.read(), response
             except Exception as ex:
-                raise ex  # TODO:
+                raise ex
