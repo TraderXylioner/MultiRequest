@@ -34,7 +34,7 @@ class Sender:
         _update_worker_task = asyncio.create_task(self._update_worker())
 
         try:
-            tasks = [self._process_task(task) for task in self.tasks]
+            tasks = [self._process_task(task, yield_request=False) for task in self.tasks]
             worker_tasks = {asyncio.create_task(task.__anext__()): task for task in tasks}
             for worker_task in worker_tasks:
                 done, _ = await asyncio.wait([worker_task])
@@ -54,11 +54,14 @@ class Sender:
         finally:
             _update_worker_task.cancel()
 
-    async def _process_task(self, task: Task) -> (Request, Task):
+    async def _process_task(self, task: Task, yield_request=True) -> (Request | None, Task):
         _requests = [asyncio.create_task(self._processing_request(_request)) for _request in task.requests]
         for _request in _requests:
             await _request
-            yield _request.result(), task
+            if yield_request:
+                yield _request.result(), task
+        if not yield_request:
+            yield None, task
 
     def _create_worker(self):
         for _service in self.services:
