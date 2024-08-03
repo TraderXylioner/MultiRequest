@@ -21,24 +21,37 @@ class Sender:
         self._worker = {}
         self._worker_time_update = time.time()
 
+    def _check_params(self):
+        if not self.tasks:
+            raise Exception('tasks not set')
+        elif not self.services:
+            raise Exception('services not set')
+        elif not self.proxies:
+            raise Exception('proxies not set')
+
     async def multi_task_run(self) -> Task:
-        _update_worker_task = asyncio.create_task(self._update_worker())
-        for _task in self.tasks:
-            async for _request in self._processing_task(_task):
-                ...
+        async for _task in self._process_tasks(yield_task=True):
             yield _task
-        _update_worker_task.cancel()
 
     async def run(self) -> Request:
-        _update_worker_task = asyncio.create_task(self._update_worker())
-        for _task in self.tasks:
-            async for _request in self._processing_task(_task):
-                yield _request
-        _update_worker_task.cancel()
+        async for _request in self._process_tasks(yield_task=False):
+            yield _request
 
-    async def _processing_task(self, task: Task) -> Request:
-        if not self.proxies:
-            raise Exception('proxies not set')  # TODO:
+    async def _process_tasks(self, yield_task: bool):
+        self._check_params()
+        _update_worker_task = asyncio.create_task(self._update_worker())
+
+        try:
+            for _task in self.tasks:
+                async for _request in self._process_task(_task):
+                    if not yield_task:
+                        yield _request
+                if yield_task:
+                    yield _task
+        finally:
+            _update_worker_task.cancel()
+
+    async def _process_task(self, task: Task) -> Request:
         _requests = [asyncio.create_task(self._processing_request(_request)) for _request in task.requests]
         for _request in _requests:
             await _request
