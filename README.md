@@ -12,7 +12,7 @@ MultiRequest is the library for sending asynchronous requests simultaneously, ta
 ### create service
 
 ``` python
-from MultiRequest.types import service
+from MultiRequest.types import Service
 
 service = Service(name='jsonplaceholder', rate_limit=10)
 ```
