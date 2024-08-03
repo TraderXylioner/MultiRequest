@@ -34,20 +34,13 @@ class Sender:
             yield _task
 
     async def run(self) -> Request:
-        async for _request in self._process_tasks(yield_task=False):
-            yield _request
-
-    async def _process_tasks(self, yield_task: bool):
         self._check_params()
         _update_worker_task = asyncio.create_task(self._update_worker())
 
         try:
             for _task in self.tasks:
-                async for _request in self._process_task(_task):
-                    if not yield_task:
-                        yield _request
-                if yield_task:
-                    yield _task
+                async for _request, _ in self._process_task(_task):
+                    yield _request
         finally:
             _update_worker_task.cancel()
 
