@@ -4,8 +4,8 @@ MultiRequest is the library for sending asynchronous requests simultaneously, ta
 
 ## Functionality
 
-- __Support for multiple services__ (send requests for several services)
-- __Proxy__ (use proxy for acceleration of data collect)
+- __Support for multiple services__ (send requests for several services).
+- __Proxy__ (use proxy for acceleration of data collect).
 
 ## quickstart
 
@@ -19,7 +19,7 @@ service = Service(name='jsonplaceholder', rate_limit=10)
 
 ### create proxy
 
-using proxy is not mandatory, if you dont set proxy the library will send requests from localhost
+using proxy is not mandatory, if you don't set proxy the library will send requests from localhost.
 
 ``` python
 from MultiRequest.types import Proxy
@@ -37,7 +37,7 @@ request=Request(url=f'https://jsonplaceholder.typicode.com/todos/1', service=ser
 
 ### create task
 
-task is an abstract object that receiving a list of requests
+task is an abstract object that receiving a list of requests.
 
 ``` python
 from MultiRequest.types import Task
@@ -110,7 +110,7 @@ if __name__ == '__main__':
 ```
 
 this code sent 200 request (10 seconds per second) in 20 seconds and printed data as soon received the answer.
-library sent request while rate limit > 0, if rate limit = 0 library reached the limit there is a wait until the rate
-limit is updated (every second).
+library sent request while rate limit > 0 on service, if rate limit = 0 library reached the limit there is a wait until
+the rate limit is updated (every second).
 
 [JSONPlaceHolder]: <https://jsonplaceholder.typicode.com/todos>
