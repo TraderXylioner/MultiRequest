@@ -2,7 +2,7 @@
 
 MultiRequest is the library for sending asynchronous requests simultaneously, taking into account the rate limit.
 
-## functionality
+## Functionality
 
 - __Support for multiple services__ (send requests for several services)
 - __Proxy__ (use proxy for acceleration of data collect)
@@ -14,7 +14,7 @@ MultiRequest is the library for sending asynchronous requests simultaneously, ta
 ``` python
 from MultiRequest.types import service
 
-service = Service(name='jsonplaceholder', rate_limit=100)
+service = Service(name='jsonplaceholder', rate_limit=10)
 ```
 
 ### create proxy
@@ -48,6 +48,8 @@ tasks = Task(requests=[request])
 ### run sender
 
 ``` python
+import asyncio
+
 from MultiRequest import Sender
 
 
@@ -64,6 +66,8 @@ if __name__ == '__main__':
 ### run multi task sender
 
 ``` python
+import asyncio
+
 from MultiRequest import Sender
 
 
@@ -76,3 +80,37 @@ if __name__ == '__main__':
     sender = Sender(tasks=[task] * 10, services=[service])
     asyncio.run(run())
 ```
+
+### How it works
+
+for example, we want to collect data from service [JSONPlaceHolder] allows to send 10 requests in second, we want to
+collect 200 pages.
+
+``` python
+import asyncio
+import time
+
+from MultiRequest import Sender
+from MultiRequest.types import Task, Service, Request
+
+
+async def run():
+    async for request in sender.run():
+        print(request.data)
+
+
+if __name__ == '__main__':
+    service = Service(name='jsonplaceholder', rate_limit=10)
+    task = Task(requests=[Request(url=f'https://jsonplaceholder.typicode.com/todos/{i}', service=service) for i in range(1, 201)])
+    sender = Sender(tasks=[task], services=[service])
+    time_start = time.time()
+    asyncio.run(run())
+    print(time.time() - time_start)
+
+```
+
+this code sent 200 request (10 seconds per second) in 20 seconds and printed data as soon received the answer.
+library sent request while rate limit > 0, if rate limit = 0 library reached the limit there is a wait until the rate
+limit is updated (every second).
+
+[JSONPlaceHolder]: <https://jsonplaceholder.typicode.com/todos>
