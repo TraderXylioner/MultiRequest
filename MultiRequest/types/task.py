@@ -4,4 +4,4 @@ from .request import Request
 
 
 class Task(BaseModel):
-    requests: list[Request]
+    requests: list[Request] = []

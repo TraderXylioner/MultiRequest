@@ -83,6 +83,8 @@ if __name__ == '__main__':
 
 ### How it works
 
+## Base Sender
+
 for example, we want to collect data from service [JSONPlaceHolder] allows to send 10 requests in second, we want to
 collect 200 pages.
 
@@ -112,5 +114,7 @@ if __name__ == '__main__':
 this code sent 200 request (10 seconds per second) in 20 seconds and printed data as soon received the answer.
 library sent request while rate limit > 0 on service, if rate limit = 0 library reached the limit there is a wait until
 the rate limit is updated (every second).
+
+## Multi task Sender
 
 [JSONPlaceHolder]: <https://jsonplaceholder.typicode.com/todos>
