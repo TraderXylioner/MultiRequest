@@ -51,11 +51,11 @@ class Sender:
         finally:
             _update_worker_task.cancel()
 
-    async def _process_task(self, task: Task) -> Request:
+    async def _process_task(self, task: Task) -> (Request, Task):
         _requests = [asyncio.create_task(self._processing_request(_request)) for _request in task.requests]
         for _request in _requests:
             await _request
-            yield _request.result()
+            yield _request.result(), task
 
     def _create_worker(self):
         for _service in self.services:
