@@ -30,8 +30,18 @@ class Sender:
             raise Exception('proxies not set')
 
     async def multi_task_run(self) -> Task:
-        async for _task in self._process_tasks(yield_task=True):
-            yield _task
+        self._check_params()
+        _update_worker_task = asyncio.create_task(self._update_worker())
+
+        try:
+            tasks = [self._process_task(task) for task in self.tasks]
+            worker_tasks = {asyncio.create_task(task.__anext__()): task for task in tasks}
+            for worker_task in worker_tasks:
+                done, _ = await asyncio.wait([worker_task])
+                _, task = next(iter(done)).result()
+                yield task
+        finally:
+            _update_worker_task.cancel()
 
     async def run(self) -> Request:
         self._check_params()
