@@ -5,6 +5,7 @@ import aiohttp
 
 from ._utils import _dispatch_request
 from .types import Task, Request, Proxy, Service
+from ._rate_limit_manager import RateLimitManager
 
 
 class Sender:
@@ -21,6 +22,7 @@ class Sender:
             self.proxies.append('localhost')
         self._worker = {}
         self._worker_time_update = time.time()
+        self.rate_limit_manager = RateLimitManager(self.services, self.proxies)
 
     def _check_params(self):
         if not self.tasks:
@@ -32,7 +34,7 @@ class Sender:
 
     async def multi_task_run(self) -> Task:
         self._check_params()
-        _update_worker_task = asyncio.create_task(self._update_worker())
+        rate_limit_manager_task = asyncio.create_task(self.rate_limit_manager.start())
 
         try:
             tasks = [self._process_task(task, yield_request=False) for task in self.tasks]
@@ -42,18 +44,18 @@ class Sender:
                 _, task = next(iter(done)).result()
                 yield task
         finally:
-            _update_worker_task.cancel()
+            rate_limit_manager_task.cancel()
 
     async def run(self) -> Request:
         self._check_params()
-        _update_worker_task = asyncio.create_task(self._update_worker())
+        rate_limit_manager_task = asyncio.create_task(self.rate_limit_manager.start())
 
         try:
             for _task in self.tasks:
                 async for _request, _ in self._process_task(_task):
                     yield _request
         finally:
-            _update_worker_task.cancel()
+            rate_limit_manager_task.cancel()
 
     async def _process_task(self, task: Task, yield_request=True) -> (Request | None, Task):
         _requests = [asyncio.create_task(self._processing_request(_request)) for _request in task.requests]
@@ -86,15 +88,3 @@ class Sender:
                         return await response.content.read(), response
             except Exception as ex:
                 raise ex
-
-    def _create_worker(self):
-        for _service in self.services:
-            self._worker.setdefault(_service.name, {}).update({proxy: _service.rate_limit for proxy in self.proxies})
-        self._worker_time_update = time.time()
-
-    async def _update_worker(self):
-        self._create_worker()
-        while True:
-            if time.time() >= self._worker_time_update + 1:
-                self._create_worker()
-            await asyncio.sleep(0)
