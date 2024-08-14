@@ -1,9 +1,6 @@
 import asyncio
-import time
 
-import aiohttp
-
-from ._utils import _dispatch_request
+from ._requester import Requester
 from .types import Task, Request, Proxy, Service
 from ._rate_limit_manager import RateLimitManager
 
@@ -20,9 +17,8 @@ class Sender:
         self.proxies = proxies or []
         if use_localhost_ip:
             self.proxies.append('localhost')
-        self._worker = {}
-        self._worker_time_update = time.time()
         self.rate_limit_manager = RateLimitManager(self.services, self.proxies)
+        self.requester = Requester
 
     def _check_params(self):
         if not self.tasks:
@@ -58,33 +54,12 @@ class Sender:
             rate_limit_manager_task.cancel()
 
     async def _process_task(self, task: Task, yield_request=True) -> (Request | None, Task):
-        _requests = [asyncio.create_task(self._processing_request(_request)) for _request in task.requests]
+        _requests = [
+            asyncio.create_task(self.requester.processing_request(_request, self.rate_limit_manager.rate_limits)) for
+            _request in task.requests]
         for _request in _requests:
             await _request
             if yield_request:
                 yield _request.result(), task
         if not yield_request:
             yield None, task
-
-    async def _processing_request(self, request: Request) -> Request:
-        while True:
-            service = self._worker[request.service.name]
-            for proxy in service:
-                if service[proxy] > 0:
-                    service[proxy] -= 1
-                    request.data, request.response_object = await self._send_request(request, proxy)
-                    return request
-                await asyncio.sleep(0)
-
-    @classmethod
-    async def _send_request(cls, request: Request, proxy: Proxy, attempts: int = 10) -> bytes:
-        while attempts:
-            try:
-                attempts -= 1
-                _proxy = None if proxy == 'localhost' else proxy.to_string()
-                async with aiohttp.ClientSession(trust_env=True, headers=request.headers) as session:
-                    async with _dispatch_request(session, request.method.value)(**request.get_request_params(),
-                                                                                ssl=True, proxy=_proxy) as response:
-                        return await response.content.read(), response
-            except Exception as ex:
-                raise ex
