@@ -63,18 +63,6 @@ class Sender:
         if not yield_request:
             yield None, task
 
-    def _create_worker(self):
-        for _service in self.services:
-            self._worker.setdefault(_service.name, {}).update({proxy: _service.rate_limit for proxy in self.proxies})
-        self._worker_time_update = time.time()
-
-    async def _update_worker(self):
-        self._create_worker()
-        while True:
-            if time.time() >= self._worker_time_update + 1:
-                self._create_worker()
-            await asyncio.sleep(0)
-
     async def _processing_request(self, request: Request) -> Request:
         while True:
             service = self._worker[request.service.name]
@@ -96,3 +84,15 @@ class Sender:
                         return await response.content.read(), response
             except Exception as ex:
                 raise ex
+
+    def _create_worker(self):
+        for _service in self.services:
+            self._worker.setdefault(_service.name, {}).update({proxy: _service.rate_limit for proxy in self.proxies})
+        self._worker_time_update = time.time()
+
+    async def _update_worker(self):
+        self._create_worker()
+        while True:
+            if time.time() >= self._worker_time_update + 1:
+                self._create_worker()
+            await asyncio.sleep(0)
