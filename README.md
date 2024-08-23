@@ -36,7 +36,7 @@ Define a request for a specific URL and service.
 ``` python
 from MultiRequest.types import Request
 
-request=Request(url=f'https://jsonplaceholder.typicode.com/todos/1', service=service)
+request=Request(url=f'https://jsonplaceholder.typicode.com/todos/1', method='GET', service=service)
 ```
 
 ### Create task
@@ -131,7 +131,7 @@ async def run():
 
 if __name__ == '__main__':
     service = Service(name='jsonplaceholder', rate_limit=10)
-    task = Task(requests=[Request(url=f'https://jsonplaceholder.typicode.com/todos/{i}', service=service) for i in range(1, 201)])
+    task = Task(requests=[Request(url=f'https://jsonplaceholder.typicode.com/todos/{i}', method='GET', service=service) for i in range(1, 201)])
     sender = Sender(tasks=[task], services=[service])
     time_start = time.time()
     asyncio.run(run())
@@ -177,7 +177,9 @@ if __name__ == '__main__':
     services = [Service(name='binance', rate_limit=2), Service(name='mexc', rate_limit=1)]
 
     tasks = [Task(requests=[Request(
-        url=f'https://api.binance.com/api/v3/ticker/24hr?symbol={symbol}' if service.name == 'binance' else f'https://api.mexc.com/api/v3/ticker/24hr?symbol={symbol}',
+        url=f'https://api.{service.name}.com/api/v3/ticker/24hr',
+        method='GET',
+        params={'symbol': symbol},
         service=service, name=service.name) for service in services]) for symbol in symbols]
 
     sender = Sender(tasks=tasks, services=services)
