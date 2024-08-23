@@ -18,7 +18,6 @@ class Sender:
         if use_localhost_ip:
             self.proxies.append('localhost')
         self.rate_limit_manager = RateLimitManager(self.services, self.proxies)
-        self.requester = Requester
 
     def _check_params(self):
         if not self.tasks:
@@ -55,7 +54,7 @@ class Sender:
 
     async def _process_task(self, task: Task, yield_request=True) -> (Request | None, Task):
         _requests = [
-            asyncio.create_task(self.requester.processing_request(_request, self.rate_limit_manager.rate_limits)) for
+            asyncio.create_task(Requester.processing_request(_request, self.rate_limit_manager.rate_limits)) for
             _request in task.requests]
         for _request in _requests:
             await _request
