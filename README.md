@@ -26,7 +26,7 @@ Using a proxy is optional. If not set, requests will be sent from localhost.
 ``` python
 from MultiRequest.types import Proxy
 
-proxy = Proxy(protocol='HTTPS', ip='0.0.0.0', port=80, user='user', password='password')
+proxy = Proxy(protocol='HTTPS', ip='0.0.0.0', port=443, user='user', password='password')
 ```
 
 ### Create a Request
