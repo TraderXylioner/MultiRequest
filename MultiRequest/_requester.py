@@ -4,6 +4,7 @@ import aiohttp
 
 from ._utils import _dispatch_request
 from .types import Request, Proxy
+from .types.request import Response
 
 
 class Requester:
@@ -14,8 +15,10 @@ class Requester:
             for proxy in service:
                 if service[proxy] > 0:
                     service[proxy] -= 1
-                    request.data, request.response_object = await cls.send_request(request, proxy)
+                    data, response_object = await cls.send_request(request, proxy)
+                    request.response = Response(response_data=data, response_object=response_object)
                     return request
+
                 await asyncio.sleep(0)
 
     @classmethod
