@@ -14,6 +14,12 @@ class Method(Enum):
     PATCH = 'PATCH'
 
 
+class Response(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+    response_data: object | None = None
+    response_object: ClientResponse | None = None
+
+
 class Request(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
@@ -21,10 +27,10 @@ class Request(BaseModel):
     method: Method
     params: dict | None = None
     headers: dict | None = None
-    service: Service
-    name: str | None = None
     data: object | None = None
-    response_object: ClientResponse | None = None
+    service: Service
+    metadata: dict | None = None
+    response: Response | None = None
 
     def get_request_params(self):
         return {'url': self.url,
