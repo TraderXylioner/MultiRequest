@@ -61,7 +61,7 @@ from MultiRequest import Sender
 
 async def run():
         async for request in sender.run():
-        print(request.data)  # -> b'{\n  "userId": 1,\n  "id": 1,\n  "title": "delectus aut autem",\n  "completed": false\n}'
+        print(request.response.data)  # -> b'{\n  "userId": 1,\n  "id": 1,\n  "title": "delectus aut autem",\n  "completed": false\n}'
 
 
 if __name__ == '__main__':
@@ -126,7 +126,7 @@ from MultiRequest.types import Task, Service, Request
 
 async def run():
     async for request in sender.run():
-        print(request.data)
+        print(request.response.data)
 
 
 if __name__ == '__main__':
