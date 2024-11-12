@@ -16,7 +16,7 @@ class Requester:
                 if service[proxy] > 0:
                     service[proxy] -= 1
                     data, response_object = await cls.send_request(request, proxy)
-                    request.response = Response(response_data=data, response_object=response_object)
+                    request.response = Response(data=data, object=response_object)
                     return request
 
                 await asyncio.sleep(0)

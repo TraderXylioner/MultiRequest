@@ -16,8 +16,8 @@ class Method(Enum):
 
 class Response(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
-    response_data: object | None = None
-    response_object: ClientResponse | None = None
+    data: object | None = None
+    object: ClientResponse | None = None
 
 
 class Request(BaseModel):
