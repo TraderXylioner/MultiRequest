@@ -5,3 +5,4 @@ from .request import Request
 
 class Task(BaseModel):
     requests: list[Request] = []
+    metadata: dict | None = None
