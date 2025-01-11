@@ -8,8 +8,10 @@ from .types.request import Response
 
 
 class Requester:
-    @classmethod
-    async def processing_request(cls, request: Request, rate_limits: dict) -> Request:
+    def __init__(self, is_raise_error: bool):
+        self.is_raise_error = is_raise_error
+
+    async def processing_request(self, request: Request, rate_limits: dict) -> Request:
         service = rate_limits[request.service.name]
         while True:
             for proxy in service:
@@ -21,8 +23,7 @@ class Requester:
 
                 await asyncio.sleep(0)
 
-    @classmethod
-    async def send_request(cls, request: Request, proxy: Proxy, attempts: int = 10) -> bytes:
+    async def send_request(self, request: Request, proxy: Proxy, attempts: int = 10) -> bytes:
         while attempts:
             try:
                 attempts -= 1
@@ -32,4 +33,5 @@ class Requester:
                                                                                 ssl=True, proxy=_proxy) as response:
                         return await response.content.read(), response
             except Exception as ex:
-                raise ex
+                if self.is_raise_error:
+                    raise ex

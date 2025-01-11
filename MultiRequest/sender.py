@@ -11,6 +11,7 @@ class Sender:
                  services: list[Service] = None,
                  proxies: list[Proxy] = None,
                  use_localhost_ip: bool = True,
+                 is_raise_error: bool = True
                  ):
         self.tasks = tasks or []
         self.services = services or []
@@ -18,6 +19,7 @@ class Sender:
         if use_localhost_ip:
             self.proxies.append('localhost')
         self.rate_limit_manager = RateLimitManager(self.services, self.proxies)
+        self.is_raise_error = is_raise_error
 
     def _check_params(self):
         if not self.tasks:
@@ -54,7 +56,7 @@ class Sender:
 
     async def _process_task(self, task: Task, yield_request=True) -> (Request | None, Task):
         _requests = [
-            asyncio.create_task(Requester.processing_request(_request, self.rate_limit_manager.rate_limits)) for
+            asyncio.create_task(Requester(is_raise_error).processing_request(_request, self.rate_limit_manager.rate_limits)) for
             _request in task.requests]
         for _request in _requests:
             await _request
