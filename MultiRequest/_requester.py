@@ -17,7 +17,7 @@ class Requester:
             for proxy in service:
                 if service[proxy] > 0:
                     service[proxy] -= 1
-                    data, response_object = await cls.send_request(request, proxy)
+                    data, response_object = await self.send_request(request, proxy)
                     request.response = Response(data=data, object=response_object)
                     return request
 
