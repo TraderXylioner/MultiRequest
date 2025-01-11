@@ -56,7 +56,7 @@ class Sender:
 
     async def _process_task(self, task: Task, yield_request=True) -> (Request | None, Task):
         _requests = [
-            asyncio.create_task(Requester(is_raise_error).processing_request(_request, self.rate_limit_manager.rate_limits)) for
+            asyncio.create_task(Requester(self.is_raise_error).processing_request(_request, self.rate_limit_manager.rate_limits)) for
             _request in task.requests]
         for _request in _requests:
             await _request
