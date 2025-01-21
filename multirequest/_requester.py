@@ -14,9 +14,9 @@ class Requester:
     async def processing_request(self, request: Request, rate_limits: dict) -> Request:
         service = rate_limits[request.service.name]
         while True:
-            for proxy in service:
-                if service[proxy] > 0:
-                    service[proxy] -= 1
+            for proxy in service['proxies']:
+                if service['proxies'][proxy] > 0:
+                    service['proxies'][proxy] -= 1
                     data, response_object = await self.send_request(request, proxy)
                     request.response = Response(data=data, object=response_object)
                     return request
