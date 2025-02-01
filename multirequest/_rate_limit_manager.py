@@ -10,13 +10,14 @@ class RateLimitManager:
 
     def create_manager(self):
         for _service in self.services:
-            self.rate_limits.setdefault(_service.name, {})['proxies'] = {proxy: _service.rate_limit for proxy in self.proxies}
+            self.rate_limits.setdefault(_service.name, {})['proxies'] = [[proxy, _service.rate_limit] for proxy in self.proxies]
             self.rate_limits[_service.name]['time_update'] = time.time()
             self.rate_limits[_service.name]['time'] = _service.time_to_update
             self.rate_limits[_service.name]['service_obj'] = _service
+            self.rate_limits[_service.name]['target'] = 0
 
     def update_manager(self, service):
-        self.rate_limits[service.name]['proxies'] = {proxy: service.rate_limit for proxy in self.proxies}
+        self.rate_limits[service.name]['proxies'] = [[proxy, service.rate_limit] for proxy in self.proxies]
         self.rate_limits[service.name]['time_update'] = time.time()
 
     async def start(self):
