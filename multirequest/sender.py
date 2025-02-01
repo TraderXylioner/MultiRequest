@@ -29,17 +29,19 @@ class Sender:
         elif not self.proxies:
             raise Exception('proxies not set')
 
-    async def multi_task_run(self) -> Task:
+    async def multi_task_run(self, workers: int = 0) -> Task:
         self._check_params()
         rate_limit_manager_task = asyncio.create_task(self.rate_limit_manager.start())
 
         try:
             tasks = [self._process_task(task, yield_request=False) for task in self.tasks]
-            worker_tasks = {asyncio.create_task(task.__anext__()): task for task in tasks}
-            for worker_task in worker_tasks:
-                done, _ = await asyncio.wait([worker_task])
-                _, task = next(iter(done)).result()
-                yield task
+            tasks_chunks = [tasks[i:i + workers] for i in range(0, len(tasks), workers)] if workers != 0 else [tasks]
+            for tasks_chunk in tasks_chunks:
+                worker_tasks = [(asyncio.create_task(task.__anext__()), task) for task in tasks_chunk]
+                for worker_task in worker_tasks:
+                    done, _ = await asyncio.wait([worker_task[0]])
+                    _, task = next(iter(done)).result()
+                    yield task
         finally:
             rate_limit_manager_task.cancel()
 
