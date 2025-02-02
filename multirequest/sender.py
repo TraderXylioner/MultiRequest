@@ -13,7 +13,7 @@ class Sender:
                  use_localhost_ip: bool = True,
                  is_raise_error: bool = True,
                  attempts: int = 10,
-                 timeout: int = 1,
+                 timeout: int | None = None,
                  ):
         self.tasks = tasks or []
         self.services = services or []

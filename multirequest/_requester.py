@@ -9,7 +9,7 @@ from .types.request import Response
 
 
 class Requester:
-    def __init__(self, is_raise_error: bool, attempts: int, timeout: int):
+    def __init__(self, is_raise_error: bool, attempts: int, timeout: int | None):
         self.is_raise_error = is_raise_error
         self.attempts = attempts
         self.timeout = timeout
