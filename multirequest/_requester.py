@@ -35,4 +35,4 @@ class Requester:
                         return await response.content.read(), response
             except Exception as ex:
                 if self.is_raise_error:
-                    raise ex
+                    raise f'Request error: {ex}\n{request} | {proxy}'

@@ -57,12 +57,16 @@ class Sender:
             rate_limit_manager_task.cancel()
 
     async def _process_task(self, task: Task, yield_request=True) -> (Request | None, Task):
-        _requests = [
-            asyncio.create_task(Requester(self.is_raise_error).processing_request(_request, self.rate_limit_manager.rate_limits)) for
-            _request in task.requests]
-        for _request in _requests:
-            await _request
-            if yield_request:
-                yield _request.result(), task
-        if not yield_request:
-            yield None, task
+        try:
+            _requests = [
+                asyncio.create_task(Requester(self.is_raise_error).processing_request(_request, self.rate_limit_manager.rate_limits)) for
+                _request in task.requests]
+            for _request in _requests:
+                await _request
+                if yield_request:
+                    yield _request.result(), task
+            if not yield_request:
+                yield None, task
+        except Exception as ex:
+            if self.is_raise_error:
+                raise f'Task error: {ex}\n{task}'
