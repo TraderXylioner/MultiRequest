@@ -9,6 +9,7 @@ class Protocol(Enum):
 
 
 class Proxy(BaseModel):
+    name: str | None = None
     protocol: Protocol
     ip: str
     port: int
