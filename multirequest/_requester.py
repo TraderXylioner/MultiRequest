@@ -29,8 +29,7 @@ class Requester:
                 await asyncio.sleep(0)
         except Exception as ex:
             if self.is_raise_error:
-                raise f'Request error: {ex}\n{request}'
-
+                raise RuntimeError(f'Request error: {ex}\n{request}')
     async def send_request(self, request: Request, proxy: Proxy) -> tuple[bytes, ClientResponse]:
         _local_attempts = self.attempts
         while _local_attempts:

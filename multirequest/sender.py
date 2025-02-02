@@ -73,4 +73,4 @@ class Sender:
                 yield None, task
         except Exception as ex:
             if self.is_raise_error:
-                raise f'Task error: {ex}\n{task}'
+                raise RuntimeError(f'Task error: {ex}\n{task}')
