@@ -30,7 +30,7 @@ class Requester:
             if proxy[1] > 0:
                 proxy[1] -= 1
                 service['target'] = 0 if service['target'] == len(service['proxies']) - 1 else service['target'] + 1
-                return proxy
+                return proxy[0]
             await asyncio.sleep(0)
 
     async def send_request(self, request: Request, service: Service) -> tuple[bytes, ClientResponse]:
