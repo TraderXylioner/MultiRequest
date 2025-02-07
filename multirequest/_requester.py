@@ -40,6 +40,9 @@ class Requester:
                     async with _dispatch_request(session, request.method.value)(**request.get_request_params(),
                                                                                 ssl=True, proxy=_proxy,
                                                                                 timeout=self.timeout) as response:
+                        if request.metadata is None:
+                            request.metadata = {}
+                        request.metadata['proxy'] = proxy
                         return await response.content.read(), response
             except Exception as ex:
                 if self.is_raise_error:
