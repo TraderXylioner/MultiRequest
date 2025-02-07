@@ -44,3 +44,4 @@ class Requester:
             except Exception as ex:
                 if self.is_raise_error:
                     raise RuntimeError(f'Request error: {ex}\n{request}')
+        return None, None

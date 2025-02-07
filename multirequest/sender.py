@@ -42,11 +42,12 @@ class Sender:
             tasks_chunks = [tasks[i:i + workers] for i in range(0, len(tasks), workers)] if workers != 0 else [tasks]
 
             for tasks_chunk in tasks_chunks:
-                worker_tasks = [asyncio.create_task(task) for task in tasks_chunk]
+                worker_tasks = [(asyncio.create_task(task.__anext__()), task) for task in tasks_chunk]
                 for worker_task in worker_tasks:
                     try:
-                        result = await worker_task
-                        yield result
+                        done, _ = await asyncio.wait([worker_task[0]])
+                        _, task = next(iter(done)).result()
+                        yield task
                     except Exception as ex:
                         if self.is_raise_error:
                             raise RuntimeError(f'Worker task error: {ex}\n{worker_task}')
