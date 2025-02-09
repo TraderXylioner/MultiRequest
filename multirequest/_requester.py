@@ -38,7 +38,7 @@ class Requester:
             try:
                 async with aiohttp.ClientSession(trust_env=True, headers=request.headers) as session:
                     async with _dispatch_request(session, request.method.value)(**request.get_request_params(),
-                                                                                ssl=True, proxy=_proxy,
+                                                                                proxy=_proxy,
                                                                                 timeout=self.timeout) as response:
                         return await response.content.read(), response
             except Exception as ex:
